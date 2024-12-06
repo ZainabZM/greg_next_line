@@ -74,8 +74,8 @@ size_t	ft_strlen(const char *str)
 
 char	*read_from_file(int fd)
 {
-	ssize_t bytes_read;
-	char 	*buffer;
+	ssize_t	bytes_read;
+	char	*buffer;
 
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
@@ -89,3 +89,4 @@ char	*read_from_file(int fd)
 	buffer[bytes_read] = '\0';
 	return (buffer);
 }
+
