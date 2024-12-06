@@ -1,6 +1,6 @@
 # greg_next_line
 Parce que get_next_line, c'est pas marrant.
-Named after my favourite (not really) classmate, greg aka le big G.
+Named after my favourite (not really) classmate, greg aka le G.
 
 GetNextLine: Because even your computer deserves a break from reading too much at once.
 
