@@ -49,6 +49,8 @@ static char	*read_until_newline(int fd, char **saved_str)
 		}
 		else
 			*saved_str = buffer;
+		if (!*saved_str && buffer && *buffer == '\n')
+			*saved_str = ft_strdup("\n");
 		newline_pos = ft_strchr(*saved_str, '\n');
 		if (newline_pos)
 			break ;
@@ -61,7 +63,7 @@ char	*handle_newline(char **saved_str)
 	char	*line;
 	char	*temp;
 
-	if ((*saved_str)[0] == '\n')
+	if (*saved_str && (*saved_str)[0] == '\n')
 	{
 		line = ft_strdup("\n");
 		temp = ft_strdup(*saved_str + 1);
@@ -78,6 +80,12 @@ char	*extract_line(char **saved_str)
 	char	*line;
 	char	*temp;
 
+	if (*saved_str && (*saved_str)[0] == '\n')
+	{
+		line = ft_strdup("\n");
+		*saved_str = NULL;
+		return (line);
+	}
 	newline_pos = ft_strchr(*saved_str, '\n');
 	if (newline_pos)
 	{
@@ -103,8 +111,19 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
+	if (saved_str && saved_str[0] == '\n')
+	{
+		line = ft_strdup("\n");
+		free(saved_str);
+		saved_str = NULL;
+		return (line);
+	}
 	if (!read_until_newline(fd, &saved_str) || !*saved_str)
-		return (free(saved_str), NULL);
+	{
+		free(saved_str);
+		saved_str = NULL;
+		return (NULL);
+	}
 	line = handle_newline(&saved_str);
 	if (line)
 		return (line);
