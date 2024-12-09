@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 15:23:23 by zamohame          #+#    #+#             */
-/*   Updated: 2024/12/09 13:49:51 by zamohame         ###   ########.fr       */
+/*   Updated: 2024/12/09 15:37:39 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,11 @@ char	*save_remainder(char *buffer)
 		remainder[j++] = buffer[i++];
 	remainder[j] = '\0';
 	free(buffer);
+	if (*remainder == '\0')
+	{
+		free(remainder);
+		remainder = NULL;
+	}
 	return (remainder);
 }
 
@@ -113,6 +118,8 @@ char	*get_next_line(int fd)
 	if (!buffer || *buffer == '\0')
 	{
 		free(temp);
+		free(buffer);
+		buffer = NULL;
 		return (NULL);
 	}
 	line = extract_line(buffer);
@@ -120,7 +127,7 @@ char	*get_next_line(int fd)
 	free(temp);
 	return (line);
 }
-/*
+
 int	main(void)
 {
 	int		fd;
@@ -146,4 +153,3 @@ int	main(void)
 	close(fd);
 	return (0);
 }
-*/
