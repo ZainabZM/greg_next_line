@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 15:19:14 by zamohame          #+#    #+#             */
-/*   Updated: 2024/12/06 11:59:03 by zamohame         ###   ########.fr       */
+/*   Updated: 2024/12/09 13:43:20 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,17 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 3
+#  define BUFFER_SIZE 10000000
 # endif
 
 char	*get_next_line(int fd);
-char	*read_from_file(int fd);
 char	*ft_strchr(const char *str, int a);
 char	*ft_strdup(char *src);
 char	*ft_strjoin(char const *s1, char const *s2);
-size_t	ft_strlen(const char *str);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+char	*save_remainder(char *buffer);
+char	*extract_line(char *buffer);
 void	*ft_memcpy(void *dest, const void *src, size_t n);
+size_t	ft_strlen(const char *str);
 
 #endif

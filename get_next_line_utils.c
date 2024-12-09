@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 16:11:03 by zamohame          #+#    #+#             */
-/*   Updated: 2024/12/06 17:02:21 by zamohame         ###   ########.fr       */
+/*   Updated: 2024/12/09 13:03:45 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,14 @@
 
 char	*ft_strchr(const char *str, int a)
 {
-	int	i;
-
-	i = 0;
-	if (a < 0 || a > 255)
+	while (*str)
+	{
+		if (*str == (char)a)
+			return ((char *)str);
+		str++;
+	}
+	if (a == '\0')
 		return ((char *)str);
-	while (str[i] && str[i] != a)
-		i++;
-	if (str[i] == a)
-		return ((char *)&str[i]);
 	return (NULL);
 }
 
@@ -72,21 +71,26 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-char	*read_from_file(int fd)
+char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	ssize_t	bytes_read;
-	char	*buffer;
+	char	*res;
+	size_t	i;
 
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
+	if (!s)
 		return (NULL);
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read <= 0)
+	if ((size_t)start >= ft_strlen((char *)s))
+		return (ft_strdup(""));
+	if (len > ft_strlen((char *)s) - start)
+		len = ft_strlen((char *)s) - start;
+	res = malloc(len + 1);
+	if (!res)
+		return (NULL);
+	i = 0;
+	while (i < len)
 	{
-		free(buffer);
-		return (NULL);
+		res[i] = s[start + i];
+		i++;
 	}
-	buffer[bytes_read] = '\0';
-	return (buffer);
+	res[i] = '\0';
+	return (res);
 }
-

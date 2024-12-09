@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 15:23:23 by zamohame          #+#    #+#             */
-/*   Updated: 2024/12/06 17:14:12 by zamohame         ###   ########.fr       */
+/*   Updated: 2024/12/09 13:49:51 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,105 +29,96 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-static char	*read_until_newline(int fd, char **saved_str)
+char	*extract_line(char *buffer)
 {
-	char	*buffer;
-	char	*temp;
-	char	*newline_pos;
-
-	while (1)
-	{
-		buffer = read_from_file(fd);
-		if (!buffer)
-			break ;
-		if (*saved_str)
-		{
-			temp = ft_strjoin(*saved_str, buffer);
-			free(*saved_str);
-			free(buffer);
-			*saved_str = temp;
-		}
-		else
-			*saved_str = buffer;
-		if (!*saved_str && buffer && *buffer == '\n')
-			*saved_str = ft_strdup("\n");
-		newline_pos = ft_strchr(*saved_str, '\n');
-		if (newline_pos)
-			break ;
-	}
-	return (*saved_str);
-}
-
-char	*handle_newline(char **saved_str)
-{
+	int		i;
 	char	*line;
-	char	*temp;
 
-	if (*saved_str && (*saved_str)[0] == '\n')
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		i++;
+	line = malloc(i + 2);
+	if (!line)
+		return (NULL);
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
 	{
-		line = ft_strdup("\n");
-		temp = ft_strdup(*saved_str + 1);
-		free(*saved_str);
-		*saved_str = temp;
-		return (line);
+		line[i] = buffer[i];
+		i++;
 	}
-	return (NULL);
-}
-
-char	*extract_line(char **saved_str)
-{
-	char	*newline_pos;
-	char	*line;
-	char	*temp;
-
-	if (*saved_str && (*saved_str)[0] == '\n')
+	if (buffer[i] == '\n')
 	{
-		line = ft_strdup("\n");
-		*saved_str = NULL;
-		return (line);
+		line[i] = buffer[i];
+		i++;
 	}
-	newline_pos = ft_strchr(*saved_str, '\n');
-	if (newline_pos)
-	{
-		*newline_pos = '\0';
-		line = ft_strdup(*saved_str);
-		temp = ft_strdup(newline_pos + 1);
-		free(*saved_str);
-		*saved_str = temp;
-	}
-	else
-	{
-		line = ft_strdup(*saved_str);
-		free(*saved_str);
-		*saved_str = NULL;
-	}
+	line[i] = '\0';
 	return (line);
+}
+
+char	*save_remainder(char *buffer)
+{
+	int		i;
+	int		j;
+	char	*remainder;
+
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		i++;
+	if (!buffer[i])
+	{
+		free(buffer);
+		return (NULL);
+	}
+	remainder = malloc(ft_strlen(buffer) - i);
+	if (!remainder)
+		return (NULL);
+	i++;
+	j = 0;
+	while (buffer[i])
+		remainder[j++] = buffer[i++];
+	remainder[j] = '\0';
+	free(buffer);
+	return (remainder);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*saved_str;
+	static char	*buffer = NULL;
 	char		*line;
+	char		*temp;
+	char		*bjr;
+	int			bytes_read;
 
+	temp = malloc(BUFFER_SIZE + 1);
 	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	if (saved_str && saved_str[0] == '\n')
 	{
-		line = ft_strdup("\n");
-		free(saved_str);
-		saved_str = NULL;
-		return (line);
-	}
-	if (!read_until_newline(fd, &saved_str) || !*saved_str)
-	{
-		free(saved_str);
-		saved_str = NULL;
+		free(temp);
 		return (NULL);
 	}
-	line = handle_newline(&saved_str);
-	if (line)
-		return (line);
-	return (extract_line(&saved_str));
+	if (!buffer)
+		buffer = ft_strdup("");
+	while (!ft_strchr(buffer, '\n') && (bytes_read = read(fd, temp,
+				BUFFER_SIZE)) > 0)
+	{
+		temp[bytes_read] = '\0';
+		bjr = buffer;
+		buffer = ft_strjoin(buffer, temp);
+		free(bjr);
+		if (!buffer)
+		{
+			free(temp);
+			return (NULL);
+		}
+	}
+	if (!buffer || *buffer == '\0')
+	{
+		free(temp);
+		return (NULL);
+	}
+	line = extract_line(buffer);
+	buffer = save_remainder(buffer);
+	free(temp);
+	return (line);
 }
 /*
 int	main(void)
@@ -149,12 +140,10 @@ int	main(void)
 		if (line == NULL)
 			break ;
 		count++;
-		printf("[%d]:%s\n", count, line);
+		printf("[%d]:%s", count, line);
 		free(line);
-		line = NULL;
 	}
 	close(fd);
-	free(line);
 	return (0);
 }
 */
