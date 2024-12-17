@@ -6,7 +6,7 @@
 /*   By: zamohame <zamohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 15:23:23 by zamohame          #+#    #+#             */
-/*   Updated: 2024/12/09 15:37:39 by zamohame         ###   ########.fr       */
+/*   Updated: 2024/12/17 12:01:06 by zamohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,19 +71,43 @@ char	*save_remainder(char *buffer)
 	}
 	remainder = malloc(ft_strlen(buffer) - i);
 	if (!remainder)
+	{
+		free(remainder);
 		return (NULL);
+	}
 	i++;
 	j = 0;
 	while (buffer[i])
 		remainder[j++] = buffer[i++];
 	remainder[j] = '\0';
 	free(buffer);
-	if (*remainder == '\0')
-	{
-		free(remainder);
-		remainder = NULL;
-	}
 	return (remainder);
+}
+
+int	handle_line(int fd, char **buffer, char *temp)
+{
+	int		bytes_read;
+	char	*bjr;
+
+	bytes_read = 0;
+	while (!ft_strchr(*buffer, '\n'))
+	{
+		bytes_read = read(fd, temp, BUFFER_SIZE);
+		if ((bytes_read) <= 0)
+			break ;
+		temp[bytes_read] = '\0';
+		bjr = *buffer;
+		*buffer = ft_strjoin(*buffer, temp);
+		free(bjr);
+		if (!*buffer)
+		{
+			free(temp);
+			return (-1);
+		}
+	}
+	if (bytes_read == -1)
+		return (-1);
+	return (bytes_read);
 }
 
 char	*get_next_line(int fd)
@@ -91,30 +115,16 @@ char	*get_next_line(int fd)
 	static char	*buffer = NULL;
 	char		*line;
 	char		*temp;
-	char		*bjr;
-	int			bytes_read;
 
 	temp = malloc(BUFFER_SIZE + 1);
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || !temp)
 	{
 		free(temp);
 		return (NULL);
 	}
 	if (!buffer)
 		buffer = ft_strdup("");
-	while (!ft_strchr(buffer, '\n') && (bytes_read = read(fd, temp,
-				BUFFER_SIZE)) > 0)
-	{
-		temp[bytes_read] = '\0';
-		bjr = buffer;
-		buffer = ft_strjoin(buffer, temp);
-		free(bjr);
-		if (!buffer)
-		{
-			free(temp);
-			return (NULL);
-		}
-	}
+	handle_line(fd, &buffer, temp);
 	if (!buffer || *buffer == '\0')
 	{
 		free(temp);
@@ -128,7 +138,7 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-int	main(void)
+/* int	main(void)
 {
 	int		fd;
 	int		count;
@@ -152,4 +162,4 @@ int	main(void)
 	}
 	close(fd);
 	return (0);
-}
+} */
